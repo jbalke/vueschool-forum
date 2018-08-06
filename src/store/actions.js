@@ -95,7 +95,6 @@ export default {
       thread.posts[postId] = postId; // can't change thread and a child property in same update so have to update the object before writing to firebase
 
       const post = { text, publishedAt, threadId, userId };
-
       const updates = {};
       // thread
       updates[`threads/${threadId}`] = thread;
@@ -124,6 +123,55 @@ export default {
         });
     });
   },
+  signOut({ commit }) {
+    return firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        commit("setAuthId", null);
+      });
+  },
+  signInWithEmailAndPassword(context, { email, password }) {
+    return firebase.auth().signInWithEmailAndPassword(email, password);
+  },
+  registerUserWithEmailAndPassword({ dispatch }, { email, name, username, password, avatar = null }) {
+    return firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(response => {
+        // console.log(response);
+        return dispatch("createUser", {
+          id: response.user.uid,
+          email,
+          name,
+          username,
+          password,
+          avatar
+        });
+      });
+    // .then(() => dispatch("fetchAuthUser")); // not required as we're now listening to auth stat changers in main.js
+  },
+  createUser({ commit, state }, { id, email, name, username, avatar = null }) {
+    return new Promise((resolve, reject) => {
+      const registeredAt = Math.floor(Date.now() / 1000);
+      const usernameLower = username.toLowerCase();
+      email = email.toLowerCase();
+      const user = { avatar, email, name, username, usernameLower, registeredAt };
+      // const userId = firebase
+      //   .database()
+      //   .ref("users")
+      //   .push().key;
+      firebase
+        .database()
+        .ref("users")
+        .child(id)
+        .set(user)
+        .then(() => {
+          commit("setItem", { resource: "users", id, item: user });
+          resolve(state.users[id]);
+        });
+    });
+  },
   updateUser({ commit }, user) {
     commit("setUser", { userId: user[".key"], user });
   },
@@ -142,6 +190,12 @@ export default {
           commit("setItem", { id, item: { ...post, text, edited }, resource: "posts" });
           resolve(post);
         });
+    });
+  },
+  fetchAuthUser({ dispatch, commit }) {
+    const userId = firebase.auth().currentUser.uid; // get currently logged in user from firebase
+    return dispatch("fetchUser", { id: userId }).then(() => {
+      commit("setAuthId", userId);
     });
   },
 

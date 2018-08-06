@@ -33,5 +33,8 @@ export default {
   appendContributorToThread: makeAppendChildToParentMutation({
     parent: "threads",
     child: "contributors"
-  })
+  }),
+  setAuthId(state, id) {
+    state.authId = id;
+  }
 };

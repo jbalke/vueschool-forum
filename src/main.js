@@ -2,7 +2,10 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import AppDate from "@/components/AppDate";
 import store from "@/store";
-import firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
+import "firebase/storage";
 import Vue from "vue";
 import App from "./App";
 import router from "./router";
@@ -22,6 +25,13 @@ const config = {
 };
 firebase.initializeApp(config);
 
+// listen to auth state changes and set the auth user on login
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    store.dispatch("fetchAuthUser");
+  }
+});
+
 /* eslint-disable no-new */
 new Vue({
   el: "#app",
@@ -30,8 +40,5 @@ new Vue({
   template: "<App/>",
   components: {
     App
-  },
-  beforeCreate() {
-    store.dispatch("fetchUser", { id: store.state.authId });
   }
 });
