@@ -123,12 +123,58 @@ export default {
         });
     });
   },
+  initAuthentication({ state, dispatch, commit }) {
+    // listen to auth state changes and set the auth user on login
+    return new Promise((resolve, reject) => {
+      // if an observer has been set, unsubscribe before creating a new subscriber.
+      if (state.unsubscribeAuthObserver) {
+        console.log("😢 unsubscribing auth observer");
+        state.unsubscribeAuthObserver();
+      }
+      // observer will continue to run in background
+      const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+        console.log("👽 the user has changed");
+        if (user) {
+          dispatch("fetchAuthUser").then(dbUser => {
+            resolve(dbUser);
+          });
+        } else {
+          resolve(null);
+        }
+      });
+      commit("setunsubscribeAuthObserver", unsubscribe);
+    });
+  },
   signOut({ commit }) {
     return firebase
       .auth()
       .signOut()
       .then(() => {
         commit("setAuthId", null);
+      });
+  },
+  signInWithGoogle({ dispatch }) {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    return firebase
+      .auth()
+      .signInWithPopup(provider)
+      .then(({ user }) => {
+        // const user = data.user;
+        firebase
+          .database()
+          .ref("users")
+          .child(user.uid)
+          .once("value", snapshot => {
+            if (!snapshot.exists()) {
+              return dispatch("createUser", {
+                id: user.uid,
+                name: user.displayName,
+                email: user.email,
+                username: user.email,
+                avatar: user.photoURL
+              }).then(() => dispatch("fetchAuthUser"));
+            }
+          });
       });
   },
   signInWithEmailAndPassword(context, { email, password }) {
@@ -148,8 +194,8 @@ export default {
           password,
           avatar
         });
-      });
-    // .then(() => dispatch("fetchAuthUser")); // not required as we're now listening to auth stat changers in main.js
+      })
+      .then(() => dispatch("fetchAuthUser"));
   },
   createUser({ commit, state }, { id, email, name, username, avatar = null }) {
     return new Promise((resolve, reject) => {
@@ -173,7 +219,17 @@ export default {
     });
   },
   updateUser({ commit }, user) {
-    commit("setUser", { userId: user[".key"], user });
+    const updatedUser = { ...user };
+    delete updatedUser[".key"];
+
+    firebase
+      .database()
+      .ref("users")
+      .child(user[".key"])
+      .set(updatedUser)
+      .then(() => {
+        commit("setItem", { id: user[".key"], item: user, resource: "users" });
+      });
   },
   updatePost({ state, commit }, { id, text }) {
     return new Promise((resolve, reject) => {
@@ -194,8 +250,23 @@ export default {
   },
   fetchAuthUser({ dispatch, commit }) {
     const userId = firebase.auth().currentUser.uid; // get currently logged in user from firebase
-    return dispatch("fetchUser", { id: userId }).then(() => {
-      commit("setAuthId", userId);
+
+    return new Promise((resolve, reject) => {
+      // check that user exists in firebase (user may have signed in with a 3rd part provider)
+      firebase
+        .database()
+        .ref("users")
+        .child(userId)
+        .once("value", snapshot => {
+          if (snapshot.exists()) {
+            return dispatch("fetchUser", { id: userId }).then(user => {
+              commit("setAuthId", userId);
+              resolve(user);
+            });
+          } else {
+            resolve(null);
+          }
+        });
     });
   },
 
@@ -248,7 +319,7 @@ export default {
         });
     });
   },
-  fetchItems({ dispatch }, { ids, resource, emoji }) {
+  fetchItems({ dispatch }, { ids = [], resource, emoji }) {
     // create an array of dispatches with map() and pass to Promise.all() to return a single promise.
     ids = Array.isArray(ids) ? ids : Object.keys(ids);
     return Promise.all(ids.map(id => dispatch("fetchItem", { id, resource, emoji })));

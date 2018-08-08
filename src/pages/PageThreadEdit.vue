@@ -2,10 +2,10 @@
   <div v-if="asyncDataStatus_ready" class="col-full push-top">
 
     <h1>Editing
-      <i>{{thread.name}}</i>
+      <i>{{thread.title}}</i>
     </h1>
 
-    <thread-editor :title="thread.title" :text="text" @save="save" @cancel="cancel" />
+    <thread-editor ref="editor" :title="thread.title" :text="text" @save="save" @cancel="cancel" />
 
   </div>
 </template>
@@ -33,6 +33,9 @@ export default {
     text() {
       const post = this.$store.state.posts[this.thread.firstPostId];
       return post ? post.text : null;
+    },
+    hasUnsavedChanges() {
+      return this.thread.title !== this.$refs.editor.form.title || this.text !== this.$refs.editor.form.text;
     }
   },
   methods: {
@@ -61,6 +64,19 @@ export default {
     this.fetchThread({ id: this.id })
       .then(thread => this.fetchPost({ id: thread.firstPostId }))
       .then(() => this.asyncDataStatus_fetched());
+  },
+  beforeRouteLeave(to, from, next) {
+    // we assign a ref to <thread-editor> so we can access its data to check if the use has entered title or text
+    if (this.hasUnsavedChanges) {
+      const confirmed = window.confirm("Are you sure you want to leave? Unsaved changes will be lost.");
+      if (confirmed) {
+        next();
+      } else {
+        next(false); // abort navigation
+      }
+    } else {
+      next();
+    }
   }
 };
 </script>

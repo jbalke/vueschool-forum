@@ -36,5 +36,8 @@ export default {
   }),
   setAuthId(state, id) {
     state.authId = id;
+  },
+  setunsubscribeAuthObserver(state, unsubscribe) {
+    state.unsubscribeAuthObserver = unsubscribe;
   }
 };

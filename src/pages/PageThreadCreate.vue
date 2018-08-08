@@ -5,7 +5,7 @@
       <i>{{forum.name}}</i>
     </h1>
 
-    <thread-editor @save="save" @cancel="cancel" />
+    <thread-editor ref="editor" @save="save" @cancel="cancel" />
 
   </div>
 </template>
@@ -16,6 +16,11 @@ import { mapActions } from "vuex";
 import asyncDataStatus from "@/mixins/asyncDataStatus.js";
 
 export default {
+  data() {
+    return {
+      saved: false
+    };
+  },
   mixins: [asyncDataStatus],
   components: {
     ThreadEditor
@@ -29,6 +34,9 @@ export default {
   computed: {
     forum() {
       return this.$store.state.forums[this.forumId];
+    },
+    hasUnsavedChanges() {
+      return (this.$refs.editor.form.title || this.$refs.editor.form.text) && !this.saved;
     }
   },
   methods: {
@@ -40,6 +48,7 @@ export default {
         text,
         forumId: this.forum[".key"]
       }).then(thread => {
+        this.saved = true;
         this.$router.push({
           name: "ThreadShow",
           params: { id: thread[".key"] }
@@ -52,6 +61,19 @@ export default {
   },
   created() {
     this.fetchForum({ id: this.forumId }).then(() => this.asyncDataStatus_fetched());
+  },
+  beforeRouteLeave(to, from, next) {
+    // we assign a ref to <thread-editor> so we can access its data to check if the use has entered title or text
+    if (this.hasUnsavedChanges) {
+      const confirmed = window.confirm("Are you sure you want to leave? Unsaved changes will be lost.");
+      if (confirmed) {
+        next();
+      } else {
+        next(false); // abort navigation
+      }
+    } else {
+      next();
+    }
   }
 };
 </script>

@@ -25,13 +25,6 @@ const config = {
 };
 firebase.initializeApp(config);
 
-// listen to auth state changes and set the auth user on login
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    store.dispatch("fetchAuthUser");
-  }
-});
-
 /* eslint-disable no-new */
 new Vue({
   el: "#app",

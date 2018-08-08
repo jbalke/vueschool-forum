@@ -25,6 +25,7 @@ export default {
     AppSpinner
   },
   methods: {
+    // the 'ready' event sent from child components triggers this to hide the spinner
     pageReady() {
       this.showPage = true;
       NProgress.done();

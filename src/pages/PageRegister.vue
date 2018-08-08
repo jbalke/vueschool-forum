@@ -36,7 +36,7 @@
 
       </form>
       <div class="text-center push-top">
-        <button class="btn-red btn-xsmall">
+        <button @click="registerWithGoogle" class="btn-red btn-xsmall">
           <i class="fa fa-google fa-btn"></i>Sign up with Google</button>
       </div>
     </div>
@@ -59,7 +59,16 @@ export default {
   methods: {
     register() {
       // console.log(this.form);
-      this.$store.dispatch("registerUserWithEmailAndPassword", this.form).then(() => this.$router.push("/"));
+      this.$store
+        .dispatch("registerUserWithEmailAndPassword", this.form)
+        .then(() => this.$router.push(this.successRedirect()));
+    },
+    registerWithGoogle() {
+      this.$store.dispatch("signInWithGoogle").then(() => this.$router.push(this.successRedirect()));
+    },
+    successRedirect() {
+      const redirect = this.$route.query.redirectTo || { name: "Home" };
+      this.$router.push(redirect);
     }
   },
   created() {

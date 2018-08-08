@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-grid">
+  <div v-if="user" class="flex-grid">
 
     <user-profile-card v-if="!edit" :user="user" />
     <user-profile-card-editor v-else :user="user" />
@@ -51,6 +51,9 @@ export default {
     }
   },
   created() {
+    this.$emit("ready");
+  },
+  updated() {
     this.$emit("ready");
   }
 };

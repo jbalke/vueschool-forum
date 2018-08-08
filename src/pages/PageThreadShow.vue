@@ -13,15 +13,18 @@
     </p>
 
     <post-list :posts="posts" />
-    <post-editor :threadId="id" />
-
+    <post-editor v-if='authUser' :threadId="id" />
+    <div v-else class="text-center" style="margin-bottom: 50px;">
+      <router-link :to="{name: 'SignIn', query: {redirectTo: $route.path}}">Sign In</router-link> or
+      <router-link :to="{name: 'Register', query: {redirectTo: $route.path}}">Register</router-link> to post a reply.
+    </div>
   </div>
 </template>
 
 <script>
 import PostList from "@/components/PostList";
 import PostEditor from "@/components/PostEditor";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import asyncDataStatus from "@/mixins/asyncDataStatus.js";
 
 export default {
@@ -38,6 +41,7 @@ export default {
   },
   methods: { ...mapActions(["fetchThread", "fetchPosts", "fetchUser"]) },
   computed: {
+    ...mapGetters(["authUser"]),
     user() {
       return this.$store.state.users[this.thread.userId];
     },

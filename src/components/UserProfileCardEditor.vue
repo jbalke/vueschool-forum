@@ -81,6 +81,9 @@ export default {
     cancel() {
       this.$router.push({ name: "Profile" });
     }
+  },
+  created() {
+    this.$emit("ready");
   }
 };
 </script>
