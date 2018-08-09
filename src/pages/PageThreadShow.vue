@@ -39,25 +39,29 @@ export default {
       type: String
     }
   },
-  methods: { ...mapActions(["fetchThread", "fetchPosts", "fetchUser"]) },
+  methods: {
+    ...mapActions("threads", ["fetchThread"]),
+    ...mapActions("posts", ["fetchPosts"]),
+    ...mapActions("users", ["fetchUser"])
+  },
   computed: {
-    ...mapGetters(["authUser"]),
+    ...mapGetters("auth", ["authUser"]),
     user() {
-      return this.$store.state.users[this.thread.userId];
+      return this.$store.state.users.items[this.thread.userId];
     },
     thread() {
-      return this.$store.state.threads[this.id];
+      return this.$store.state.threads.items[this.id];
     },
     posts() {
       const postIds = Object.values(this.thread.posts);
 
-      return Object.values(this.$store.state.posts).filter(post => postIds.includes(post[".key"])); // get all post objects from posts and filter on post ids in thread object
+      return Object.values(this.$store.state.posts.items).filter(post => postIds.includes(post[".key"])); // get all post objects from posts and filter on post ids in thread object
     },
     replyCount() {
-      return this.$store.getters.threadRepliesCount(this.thread[".key"]);
+      return this.$store.getters["threads/threadRepliesCount"](this.thread[".key"]);
     },
     contributorsCount() {
-      return this.$store.getters.threadContributorsCount(this.thread[".key"]);
+      return this.$store.getters["threads/threadContributorsCount"](this.thread[".key"]);
 
       // // get replies and filter out the first post
       // const replies = Object.keys(this.thread.posts)
@@ -88,9 +92,7 @@ export default {
         //   });
         // });
 
-        return this.fetchPosts({ ids: Object.keys(thread.posts) }).then(posts =>
-          Promise.all(posts.map(post => this.fetchUser({ id: post.userId })))
-        );
+        return this.fetchPosts({ ids: Object.keys(thread.posts) }).then(posts => Promise.all(posts.map(post => this.fetchUser({ id: post.userId }))));
       })
       .then(() => this.asyncDataStatus_fetched());
   }

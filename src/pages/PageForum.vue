@@ -23,7 +23,11 @@ import asyncDataStatus from "@/mixins/asyncDataStatus.js";
 
 export default {
   mixins: [asyncDataStatus],
-  methods: { ...mapActions(["fetchForum", "fetchThreads", "fetchUser"]) },
+  methods: {
+    ...mapActions("forums", ["fetchForum"]),
+    ...mapActions("threads", ["fetchThreads"]),
+    ...mapActions("users", ["fetchUser"])
+  },
   components: {
     ThreadList
   },
@@ -36,10 +40,10 @@ export default {
   computed: {
     // we create these as computed properties so they will be re-evaluated when their dependencies change. Data properties would not do this.
     forum() {
-      return this.$store.state.forums[this.id];
+      return this.$store.state.forums.items[this.id];
     },
     threads() {
-      return Object.values(this.$store.state.threads).filter(thread => thread.forumId === this.id);
+      return Object.values(this.$store.state.threads.items).filter(thread => thread.forumId === this.id);
     }
   },
   created() {

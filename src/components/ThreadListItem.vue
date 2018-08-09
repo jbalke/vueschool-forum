@@ -25,10 +25,11 @@
 export default {
   computed: {
     replyCount() {
-      return this.$store.getters.threadRepliesCount(this.thread[".key"]);
+      // if we don't use mapGetters and specify a namespace we have to use bracket syntax and specify a namespace.
+      return this.$store.getters["threads/threadRepliesCount"](this.thread[".key"]); // dynamic getter i.e. returns a function
     },
     user() {
-      return this.$store.state.users[this.thread.userId];
+      return this.$store.state.users.items[this.thread.userId];
     }
   },
   props: {

@@ -59,12 +59,10 @@ export default {
   methods: {
     register() {
       // console.log(this.form);
-      this.$store
-        .dispatch("registerUserWithEmailAndPassword", this.form)
-        .then(() => this.$router.push(this.successRedirect()));
+      this.$store.dispatch("auth/registerUserWithEmailAndPassword", this.form).then(() => this.$router.push(this.successRedirect()));
     },
     registerWithGoogle() {
-      this.$store.dispatch("signInWithGoogle").then(() => this.$router.push(this.successRedirect()));
+      this.$store.dispatch("auth/signInWithGoogle").then(() => this.$router.push(this.successRedirect()));
     },
     successRedirect() {
       const redirect = this.$route.query.redirectTo || { name: "Home" };

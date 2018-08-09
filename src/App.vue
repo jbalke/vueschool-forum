@@ -3,7 +3,7 @@
     <TheNavBar/>
     <div class="container">
       <!--  can't use v-if as the component will not render and the compnent code will not run -->
-      <router-view v-show="showPage" @ready='pageReady' />
+      <router-view :key="$route.path" v-show="showPage" @ready='pageReady' />
       <app-spinner v-show="!showPage" class="push-top" />
     </div>
   </div>

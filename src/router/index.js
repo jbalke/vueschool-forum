@@ -100,7 +100,8 @@ const router = new Router({
 // global navigation guard middleware
 router.beforeEach((to, from, next) => {
   console.log(`🚦 navigating to ${to.name} from ${from.name}.`);
-  store.dispatch("initAuthentication").then(user => {
+  // no need to pass {root: true} as we're not in a namespeaced module are are in global namespace
+  store.dispatch("auth/initAuthentication").then(user => {
     // check for matched/nested routes and protect them as well
     if (to.matched.some(route => route.meta.requiresAuth)) {
       // protected route

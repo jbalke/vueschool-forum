@@ -64,12 +64,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: "authUser"
+      user: "auth/authUser"
     })
   },
   methods: {
     signOut() {
-      this.$store.dispatch("signOut").then(() => {
+      this.$store.dispatch("auth/signOut").then(() => {
         this.$router.push("/");
       });
     }

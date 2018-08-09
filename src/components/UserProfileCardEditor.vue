@@ -56,10 +56,10 @@ export default {
   computed: {
     userPostsCount() {
       // return countObjectProperties(this.user.posts);
-      return this.$store.getters.userPostsCount(this.user[".key"]);
+      return this.$store.getters["users/userPostsCount"](this.user[".key"]);
     },
     userThreadsCount() {
-      return this.$store.getters.userThreadsCount(this.user[".key"]);
+      return this.$store.getters["users/userThreadsCount"](this.user[".key"]);
     }
   },
   props: {
@@ -75,15 +75,12 @@ export default {
   },
   methods: {
     save() {
-      this.$store.dispatch("updateUser", { ...this.activeUser }); // to avoid binding activeUser with state we send a cloned object.
+      this.$store.dispatch("users/updateUser", { ...this.activeUser }); // to avoid binding activeUser with state we send a cloned object.
       this.$router.push({ name: "Profile" });
     },
     cancel() {
       this.$router.push({ name: "Profile" });
     }
-  },
-  created() {
-    this.$emit("ready");
   }
 };
 </script>

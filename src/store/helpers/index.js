@@ -1,23 +1,14 @@
-import Vue from 'vue';
+import Vue from "vue";
 
-const makeAppendChildToParentMutation = ({
-    parent,
-    child
-  }) =>
-  (state, {
-    childId,
-    parentId
-  }) => {
-    const resource = state[parent][parentId];
-    if (!resource[child]) {
-      Vue.set(resource, child, {}); // initialise the child object
-    }
-    Vue.set(resource[child], childId, childId);
-  };
-
-export {
-  makeAppendChildToParentMutation
+const makeAppendChildToParentMutation = ({ parent, child }) => (state, { childId, parentId }) => {
+  const resource = state.items[parentId];
+  if (!resource[child]) {
+    Vue.set(resource, child, {}); // initialise the child object
+  }
+  Vue.set(resource[child], childId, childId);
 };
+
+export { makeAppendChildToParentMutation };
 
 // appendPostToThread(state, {
 //   postId,

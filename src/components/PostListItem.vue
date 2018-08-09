@@ -52,15 +52,15 @@ export default {
   },
   computed: {
     user() {
-      return this.$store.state.users[this.post.userId];
+      return this.$store.state.users.items[this.post.userId];
     },
     userPostsCount() {
       // getters don't take arguments but userPostsCount returns a function that does!
-      return this.$store.getters.userPostsCount(this.post.userId);
+      return this.$store.getters["users/userPostsCount"](this.post.userId);
     },
     userThreadsCount() {
       // getters don't take arguments but userThreadsCount returns a function that does!
-      return this.$store.getters.userThreadsCount(this.post.userId);
+      return this.$store.getters["users/userThreadsCount"](this.post.userId);
     }
   }
 };

@@ -18,7 +18,8 @@ import asyncDataStatus from "@/mixins/asyncDataStatus.js";
 export default {
   mixins: [asyncDataStatus],
   methods: {
-    ...mapActions(["fetchCategory", "fetchForums"])
+    ...mapActions("categories", ["fetchCategory"]),
+    ...mapActions("forums", ["fetchForums"])
   },
   props: {
     id: {
@@ -31,7 +32,7 @@ export default {
   },
   computed: {
     category() {
-      return this.$store.state.categories[this.id];
+      return this.$store.state.categories.items[this.id];
     }
   },
   created() {

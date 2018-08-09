@@ -12,7 +12,8 @@ import asyncDataStatus from "@/mixins/asyncDataStatus.js";
 
 export default {
   methods: {
-    ...mapActions(["fetchAllCategories", "fetchForums"])
+    ...mapActions("categories", ["fetchAllCategories"]), // (namespace, [actions])
+    ...mapActions("forums", ["fetchForums"])
   },
   components: {
     CategoryList
@@ -20,14 +21,12 @@ export default {
   mixins: [asyncDataStatus],
   computed: {
     categories() {
-      return Object.values(this.$store.state.categories);
+      return Object.values(this.$store.state.categories.items);
     }
   },
   created() {
     this.fetchAllCategories()
-      .then(categories =>
-        Promise.all(categories.map(category => this.fetchForums({ ids: Object.keys(category.forums) })))
-      )
+      .then(categories => Promise.all(categories.map(category => this.fetchForums({ ids: Object.keys(category.forums) }))))
       .then(() => {
         this.asyncDataStatus_fetched();
       })

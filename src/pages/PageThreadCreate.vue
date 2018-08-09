@@ -33,14 +33,15 @@ export default {
   },
   computed: {
     forum() {
-      return this.$store.state.forums[this.forumId];
+      return this.$store.state.forums.items[this.forumId];
     },
     hasUnsavedChanges() {
       return (this.$refs.editor.form.title || this.$refs.editor.form.text) && !this.saved;
     }
   },
   methods: {
-    ...mapActions(["createThread", "fetchForum"]),
+    ...mapActions("threads", ["createThread"]),
+    ...mapActions("forums", ["fetchForum"]),
     save({ title, text }) {
       // as we don't know the threadId until it is handled by the createThread action, we have the action return a promise with the complete thread object!
       this.createThread({
