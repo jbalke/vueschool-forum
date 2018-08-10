@@ -68,7 +68,7 @@ export default {
       // this.$set(this.$store.state.posts, postId, post);
 
       this.text = "";
-      return this.ceatePost(post); // as update() and create() both emit the same event and payload, move the emit to save()
+      return this.createPost(post); // as update() and create() both emit the same event and payload, move the emit to save()
     },
     update() {
       const payload = {

@@ -34,6 +34,7 @@ export default {
           commit("threads/appendContributorToThread", { childId: post.userId, parentId: post.threadId }, { root: true });
           commit("users/appendPostToUser", { childId: postId, parentId: post.userId }, { root: true });
 
+          // no need to wrap in new Promise() as mutations are synchronise
           return Promise.resolve(state.items[postId]);
         });
     },
