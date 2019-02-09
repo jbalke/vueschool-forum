@@ -102,7 +102,7 @@ export default {
       const userId = firebase.auth().currentUser.uid; // get currently logged in user from firebase
 
       return new Promise((resolve, reject) => {
-        // check that user exists in firebase (user may have signed in with a 3rd part provider)
+        // check that user exists in firebase (user may have signed in with a 3rd party provider)
         firebase
           .database()
           .ref("users")
